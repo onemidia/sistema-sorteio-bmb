@@ -1,16 +1,1 @@
-User: FILIAL01 e Senha: 123456
-
-
-https://supabase.com/dashboard/project/qbbooteyllyuitjbxfyr
-supabase
-bmb sorteador
-@Maria011002&
-
-https://vercel.com/
-
-conta google:
-onemidiaindoora@gmail.com
-
-
-git config --global user.email "onemidiaindoora@gmail.com"
-git config --global user.name "onemidia"
+TESTE
