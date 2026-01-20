@@ -352,12 +352,11 @@
             // --- Autenticação ---
 
             async login() {
-                // Captura apenas o código e a senha, ignorando a necessidade de validar o nome exato
                 const codeInput = document.getElementById('branch-code').value.trim().toUpperCase();
                 const passInput = document.getElementById('password').value.trim();
                 const errorMsg = document.getElementById('login-error');
 
-                // Consulta simplificada no Supabase
+                // Consulta que ignora o Nome da Filial para evitar erros de comparação
                 const { data: users, error } = await supabaseClient
                     .from('filiais')
                     .select('*')
@@ -365,12 +364,10 @@
                     .eq('senha', passInput);
 
                 if (error) {
-                    console.error("Erro Supabase:", error);
-                    alert("Erro de conexão: " + error.message);
+                    console.error("Erro na conexão:", error);
                     return;
                 }
 
-                // Se encontrar o par código/senha, permite o acesso
                 if (users && users.length > 0) {
                     this.currentUser = users[0];
                     localStorage.setItem('raffle_session', JSON.stringify(this.currentUser));
