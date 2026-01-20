@@ -356,22 +356,21 @@
                 const passInput = document.getElementById('password').value.trim();
                 const errorMsg = document.getElementById('login-error');
 
-                // ESTA CONSULTA É A CHAVE: Valida apenas os dados essenciais
-                const { data: users, error } = await supabaseClient
+                // BUSCA APENAS POR CÓDIGO E SENHA
+                const { data, error } = await supabaseClient
                     .from('filiais')
                     .select('*')
                     .eq('codigo_filial', codeInput)
                     .eq('senha', passInput);
 
                 if (error) {
-                    console.error("Erro na consulta:", error);
+                    console.error("Erro:", error.message);
                     return;
                 }
 
-                if (users && users.length > 0) {
-                    this.currentUser = users[0];
+                if (data && data.length > 0) {
+                    this.currentUser = data[0];
                     localStorage.setItem('raffle_session', JSON.stringify(this.currentUser));
-                    errorMsg.classList.add('hidden');
                     this.showDashboard();
                 } else {
                     errorMsg.classList.remove('hidden');
