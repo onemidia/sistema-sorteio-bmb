@@ -358,11 +358,12 @@
                     .select('*')
                     .eq('codigo_filial', codeInput)
                     .eq('senha', passInput)
-                    .single();
+                    .maybeSingle();
 
                 if (error) {
                     console.error("Erro Supabase:", error);
                     alert("Erro ao conectar no banco: " + error.message);
+                    return;
                 }
 
                 if (user) {
