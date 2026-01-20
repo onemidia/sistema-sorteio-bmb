@@ -349,8 +349,10 @@
             async login() {
                 const nameInput = document.getElementById('branch-name').value.trim();
                 const codeInput = document.getElementById('branch-code').value.trim().toUpperCase();
-                const passInput = document.getElementById('password').value;
+                const passInput = document.getElementById('password').value.trim();
                 const errorMsg = document.getElementById('login-error');
+
+                console.log("Tentando login...", { code: codeInput, pass: passInput });
 
                 // Consulta ao Supabase
                 const { data: user, error } = await supabase
@@ -364,6 +366,10 @@
                     console.error("Erro Supabase:", error);
                     alert("Erro ao conectar no banco: " + error.message);
                     return;
+                }
+                
+                if (!user) {
+                    console.warn("Usuário não encontrado. Verifique se o RLS está desativado no Supabase.");
                 }
 
                 if (user) {
