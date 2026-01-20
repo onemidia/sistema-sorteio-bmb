@@ -356,7 +356,7 @@
                 const passInput = document.getElementById('password').value.trim();
                 const errorMsg = document.getElementById('login-error');
 
-                // Consulta que ignora o Nome da Filial para evitar erros de comparação
+                // ESTA CONSULTA É A CHAVE: Valida apenas os dados essenciais
                 const { data: users, error } = await supabaseClient
                     .from('filiais')
                     .select('*')
@@ -364,7 +364,7 @@
                     .eq('senha', passInput);
 
                 if (error) {
-                    console.error("Erro na conexão:", error);
+                    console.error("Erro na consulta:", error);
                     return;
                 }
 
