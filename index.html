@@ -288,7 +288,7 @@
         // Substitua pelas suas credenciais do projeto Supabase
         const SUPABASE_URL = 'https://qbbooteyllyuitjbxfyr.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiYm9vdGV5bGx5dWl0amJ4ZnlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3ODc0MTksImV4cCI6MjA4NDM2MzQxOX0._VvvR-Hi_Qw1FG1MJwLeF03XMJxgRBCXvJHY-V4c-N0';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         /**
          * Classe Principal da Aplicação
@@ -355,7 +355,7 @@
                 console.log("Tentando login...", { code: codeInput, pass: passInput });
 
                 // Consulta ao Supabase
-                const { data: user, error } = await supabase
+                const { data: user, error } = await supabaseClient
                     .from('filiais')
                     .select('*')
                     .eq('codigo_filial', codeInput)
@@ -375,7 +375,7 @@
                 if (user) {
                     // Atualiza o nome da filial com o que foi digitado no input, se houver
                     if (nameInput && nameInput !== user.nome_filial) {
-                        await supabase.from('filiais').update({ nome_filial: nameInput }).eq('id', user.id);
+                        await supabaseClient.from('filiais').update({ nome_filial: nameInput }).eq('id', user.id);
                         user.nome_filial = nameInput;
                     }
                     
@@ -495,7 +495,7 @@
             async saveResult(number) {
                 const item = this.raffleItemInput.value.trim();
                 
-                const { error } = await supabase.from('raffle_history').insert({
+                const { error } = await supabaseClient.from('raffle_history').insert({
                     branch_code: this.currentUser.codigo_filial,
                     number: number,
                     item: item
@@ -508,7 +508,7 @@
             async deleteResult(id) {
                 if(!confirm('Deseja realmente excluir este resultado?')) return;
 
-                const { error } = await supabase.from('raffle_history').delete().eq('id', id);
+                const { error } = await supabaseClient.from('raffle_history').delete().eq('id', id);
                 if (error) console.error('Erro ao deletar:', error);
                 
                 this.renderHistory();
@@ -517,14 +517,14 @@
             async clearHistory() {
                 if(!confirm('Tem certeza que deseja apagar TODO o histórico desta filial?')) return;
                 
-                const { error } = await supabase.from('raffle_history').delete().eq('branch_code', this.currentUser.codigo_filial);
+                const { error } = await supabaseClient.from('raffle_history').delete().eq('branch_code', this.currentUser.codigo_filial);
                 if (error) console.error('Erro ao limpar:', error);
                 
                 this.renderHistory();
             }
 
             async renderHistory() {
-                const { data: history, error } = await supabase
+                const { data: history, error } = await supabaseClient
                     .from('raffle_history')
                     .select('*')
                     .eq('branch_code', this.currentUser.codigo_filial)
@@ -587,7 +587,7 @@
                 const code = document.getElementById('new-branch-code').value.trim().toUpperCase();
                 const pass = document.getElementById('new-branch-pass').value.trim();
 
-                const { error } = await supabase.from('filiais').insert({
+                const { error } = await supabaseClient.from('filiais').insert({
                     codigo_filial: code,
                     senha: pass,
                     nome_filial: name
@@ -611,7 +611,7 @@
                 const tbody = document.getElementById('branches-list');
                 tbody.innerHTML = '';
                 
-                const { data: users, error } = await supabase.from('filiais').select('*').order('nome_filial');
+                const { data: users, error } = await supabaseClient.from('filiais').select('*').order('nome_filial');
                 if (error) return;
 
                 users.forEach(user => {
@@ -631,8 +631,8 @@
                 tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Carregando...</td></tr>';
                 
                 // Busca histórico e filiais
-                const { data: history } = await supabase.from('raffle_history').select('*').order('created_at', { ascending: false });
-                const { data: branches } = await supabase.from('filiais').select('codigo_filial, nome_filial');
+                const { data: history } = await supabaseClient.from('raffle_history').select('*').order('created_at', { ascending: false });
+                const { data: branches } = await supabaseClient.from('filiais').select('codigo_filial, nome_filial');
                 
                 // Mapa de códigos para nomes
                 const branchMap = {};
