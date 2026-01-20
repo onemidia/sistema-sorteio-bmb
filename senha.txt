@@ -10,3 +10,7 @@ https://vercel.com/
 
 conta google:
 onemidiaindoora@gmail.com
+
+
+git config --global user.email "onemidiaindoora@gmail.com"
+git config --global user.name "onemidia"

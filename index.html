@@ -287,7 +287,7 @@
         // CONFIGURAÇÃO DO SUPABASE
         // Substitua pelas suas credenciais do projeto Supabase
         const SUPABASE_URL = 'https://qbbooteyllyuitjbxfyr.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_tsw3CJ5zxYAXCSIlKLxsfA_E7Ailwm1';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiYm9vdGV5bGx5dWl0amJ4ZnlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3ODc0MTksImV4cCI6MjA4NDM2MzQxOX0._VvvR-Hi_Qw1FG1MJwLeF03XMJxgRBCXvJHY-V4c-N0';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         /**
@@ -359,6 +359,11 @@
                     .eq('code', codeInput)
                     .eq('password', passInput)
                     .single();
+
+                if (error) {
+                    console.error("Erro Supabase:", error);
+                    alert("Erro ao conectar no banco: " + error.message);
+                }
 
                 if (user) {
                     // Atualiza o nome da filial com o que foi digitado no input, se houver
