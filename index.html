@@ -135,9 +135,14 @@
                         <span class="text-xs text-white/80">Painel Administrativo</span>
                     </div>
                 </div>
-                <button onclick="app.logout()" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition flex items-center gap-2">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sair
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="admin-btn" onclick="app.toggleAdminScreen()" class="hidden text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield"></i> Painel Admin
+                    </button>
+                    <button onclick="app.logout()" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -347,38 +352,25 @@
             // --- Autenticação ---
 
             async login() {
-                const nameInput = document.getElementById('branch-name').value.trim();
                 const codeInput = document.getElementById('branch-code').value.trim().toUpperCase();
                 const passInput = document.getElementById('password').value.trim();
                 const errorMsg = document.getElementById('login-error');
 
-                console.log("Tentando login...", { code: codeInput, pass: passInput });
-
-                // Consulta ao Supabase
-                const { data: user, error } = await supabaseClient
+                // Consulta validando apenas Código e Senha
+                const { data: users, error } = await supabaseClient
                     .from('filiais')
                     .select('*')
                     .eq('codigo_filial', codeInput)
-                    .eq('senha', passInput)
-                    .maybeSingle();
+                    .eq('senha', passInput);
 
                 if (error) {
                     console.error("Erro Supabase:", error);
                     alert("Erro ao conectar no banco: " + error.message);
                     return;
                 }
-                
-                if (!user) {
-                    console.warn("Usuário não encontrado. Verifique se o RLS está desativado no Supabase.");
-                }
 
-                if (user) {
-                    // Atualiza o nome da filial com o que foi digitado no input, se houver
-                    if (nameInput && nameInput !== user.nome_filial) {
-                        await supabaseClient.from('filiais').update({ nome_filial: nameInput }).eq('id', user.id);
-                        user.nome_filial = nameInput;
-                    }
-                    
+                if (users && users.length > 0) {
+                    const user = users[0];
                     this.currentUser = user;
                     localStorage.setItem('raffle_session', JSON.stringify(user));
                     errorMsg.classList.add('hidden');
