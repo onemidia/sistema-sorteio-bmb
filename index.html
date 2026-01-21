@@ -426,8 +426,8 @@
         class RaffleApp {
             constructor() {
                 // Configurações
-                this.maxNumber = 10000; // Valor inicial
-                this.animationDuration = 10000; // 10 segundos em ms
+                this.maxNumber = 9999; // Valor inicial
+                this.animationDuration = 9999; // 10 segundos em ms
                 this.storageKeyPrefix = 'raffle_data_';
                 
                 // Estado
@@ -609,7 +609,7 @@
                 if (window.crypto && window.crypto.getRandomValues) {
                     const array = new Uint32Array(1);
                     window.crypto.getRandomValues(array);
-                    // Normaliza para o range 0 - 10000
+                    // Normaliza para o range 0 - 9999
                     finalNumber = array[0] % (this.maxNumber + 1);
                 } else {
                     finalNumber = Math.floor(Math.random() * (this.maxNumber + 1));
