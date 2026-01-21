@@ -199,7 +199,7 @@
     <section id="dashboard-screen" class="hidden h-screen w-full fade-in bg-app-bg overflow-hidden">
         
         <!-- Sidebar (Desktop) -->
-        <aside class="hidden md:flex flex-col w-64 bg-[#050505] border-r border-border-light fixed inset-y-0 left-0 z-20 h-full">
+        <aside class="hidden md:flex flex-col w-[15vw] bg-[#050505] border-r border-border-light fixed inset-y-0 left-0 z-20 h-full">
             <div class="p-6 border-b border-border-light flex items-center justify-center">
                 <img src="logo-bmb.png" alt="BMB" class="h-12">
             </div>
@@ -212,25 +212,17 @@
                 <button onclick="app.navigateTo('events')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-white/10 hover:text-bmb-blue transition" data-view="events">
                     <i class="fa-regular fa-calendar-check w-5"></i> Meus Eventos
                 </button>
+                
+                <button onclick="app.navigateTo('history')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-white/10 hover:text-bmb-blue transition" data-view="history">
+                    <i class="fa-solid fa-list w-5"></i> Histórico Geral
+                </button>
 
                 <button id="sidebar-admin-btn" onclick="app.navigateTo('admin')" class="hidden nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-white/10 hover:text-bmb-blue transition" data-view="admin">
                     <i class="fa-solid fa-user-shield w-5"></i> Admin Geral
                 </button>
             </nav>
 
-            <!-- Histórico na Sidebar -->
-            <div class="flex-grow flex flex-col overflow-hidden border-t border-border-light bg-white/5">
-                <div class="p-3 border-b border-border-light flex justify-between items-center bg-[#0a0a0a]">
-                    <h3 class="text-xs font-bold text-txt-muted uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico</h3>
-                    <span id="history-count" class="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded-full">0</span>
-                </div>
-                <div id="history-list" class="flex-grow overflow-y-auto p-2 space-y-2 custom-scrollbar">
-                    <!-- Itens via JS -->
-                </div>
-                <button onclick="app.clearHistory()" class="text-[10px] text-status-danger hover:text-red-400 w-full py-2 text-center border-t border-border-light bg-[#0a0a0a]">Limpar Histórico</button>
-            </div>
-
-            <div class="p-4 border-t border-border-light flex-shrink-0 bg-[#050505]">
+            <div class="p-4 border-t border-border-light flex-shrink-0 bg-[#050505] mt-auto">
                 <div class="mb-3 px-2">
                     <p class="text-xs text-txt-muted uppercase font-bold mb-1">Logado como</p>
                     <p class="text-sm font-semibold text-txt-title truncate" id="sidebar-branch-name">Filial</p>
@@ -260,24 +252,25 @@
         </div>
 
         <!-- Main Content Area -->
-        <main class="md:ml-64 h-screen overflow-hidden p-4">
+        <main class="md:ml-[15vw] h-screen overflow-hidden p-4">
             
             <!-- Marca D'água Sutil -->
             <img src="logo-bmb-iniciais.png" class="fixed top-1/2 left-[calc(50%+8rem)] transform -translate-x-1/2 -translate-y-1/2 w-[40%] opacity-[0.03] pointer-events-none z-0">
 
             <!-- VIEW: SORTEADOR (HOME) -->
-            <div id="view-home" class="view-section flex items-center justify-center fade-in relative z-10 h-full w-full">
+            <div id="view-home" class="view-section grid grid-cols-[60fr_25fr] gap-6 fade-in relative z-10 h-full w-full">
                 <!-- Área de Sorteio -->
-                <div class="w-1/2 h-full flex flex-col justify-center">
+                <div class="h-full flex flex-col justify-center">
                     <div class="bg-app-card rounded-[24px] shadow-2xl p-8 text-center border border-border-light flex flex-col items-center justify-center h-full relative overflow-hidden backdrop-blur-sm bg-opacity-90">
                         <button id="fullscreen-btn" onclick="app.toggleFullScreenView()" class="absolute top-4 right-4 text-txt-muted hover:text-bmb-blue transition p-2" title="Modo Telão">
                             <i class="fa-solid fa-expand text-xl"></i>
                         </button>
-                        <!-- Logo removida daqui para limpar o visual -->
+                        
+                        <img src="logo-bmb-iniciais.png" alt="BMB Logo" class="h-20 mb-6 opacity-90">
                         <h3 class="text-txt-muted uppercase tracking-[0.2em] text-lg font-bold mb-4">Sorteio em Andamento</h3>
                         
                         <div class="w-full flex-grow flex items-center justify-center">
-                            <span id="raffle-display" class="digit-display font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] select-none" style="font-size: 15vw;">
+                            <span id="raffle-display" class="digit-display font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] select-none" style="font-size: clamp(8rem, 18vw, 30vh);">
                                 000000
                             </span>
                         </div>
@@ -302,6 +295,20 @@
                                 <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Sorteando...
                             </span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Histórico (Direita) -->
+                <div class="h-full flex flex-col overflow-hidden bg-app-card rounded-[24px] border border-border-light shadow-xl">
+                    <div class="p-4 border-b border-border-light bg-app-muted flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-txt-title uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico</h3>
+                        <span id="history-count" class="bg-white/10 border border-border-light text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="history-list" class="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                        <!-- Itens via JS -->
+                    </div>
+                    <div class="p-3 border-t border-border-light text-center bg-app-muted">
+                        <button onclick="app.clearHistory()" class="text-xs text-status-danger hover:underline">Limpar Histórico</button>
                     </div>
                 </div>
             </div>
@@ -680,15 +687,15 @@
                 history.forEach(item => {
                     const date = new Date(item.created_at).toLocaleString('pt-BR');
                     const div = document.createElement('div');
-                    div.className = 'flex flex-col bg-white/5 p-2 rounded-[8px] border border-white/10 hover:border-bmb-blue transition-colors group';
+                    div.className = 'flex flex-col bg-white/5 p-2 rounded-[6px] border border-white/10 hover:border-bmb-blue transition-colors group';
                     div.innerHTML = `
                         <div class="flex justify-between items-center mb-1">
-                            <span class="block font-mono font-bold text-lg text-[#FFD700] tracking-widest">${item.number}</span>
+                            <span class="block font-mono font-bold text-sm text-[#FFD700] tracking-widest">${item.number}</span>
                             <button onclick="app.deleteResult(${item.id})" class="text-txt-muted hover:text-status-danger opacity-0 group-hover:opacity-100 transition p-1" title="Excluir"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
                         </div>
                         <div>
-                            ${item.item ? `<span class="text-[10px] font-bold text-white mb-0.5 block uppercase tracking-wide truncate">${item.item}</span>` : ''}
-                            <span class="text-[9px] text-txt-muted block">${date}</span>
+                            ${item.item ? `<span class="text-[9px] font-bold text-white mb-0.5 block uppercase tracking-wide truncate">${item.item}</span>` : ''}
+                            <span class="text-[8px] text-txt-muted block">${date}</span>
                         </div>
                     `;
                     this.historyList.appendChild(div);
