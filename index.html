@@ -17,6 +17,9 @@
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <!-- Configuração de Cores Personalizadas (Tailwind Config) -->
     <script>
         tailwind.config = {
@@ -122,166 +125,185 @@
     </section>
 
     <!-- ======================== DASHBOARD ======================== -->
-    <section id="dashboard-screen" class="hidden flex-col min-h-screen w-full fade-in">
+    <section id="dashboard-screen" class="hidden min-h-screen w-full fade-in bg-app-bg">
         
-        <!-- Header -->
-        <header class="bg-bmb-blue text-white shadow-sm">
-            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <!-- Logo no Header -->
-                    <img src="logo-bmb.png" alt="BMB" class="h-10 bg-white rounded p-1">
-                    <div>
-                        <h2 class="font-bold text-lg leading-tight" id="header-branch-name">Filial Desconhecida</h2>
-                        <span class="text-xs text-white/80">Painel Administrativo</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button id="admin-btn" onclick="app.toggleAdminScreen()" class="hidden text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition flex items-center gap-2">
-                        <i class="fa-solid fa-user-shield"></i> Painel Admin
-                    </button>
-                    <button onclick="app.logout()" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition flex items-center gap-2">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sair
-                    </button>
-                </div>
+        <!-- Sidebar (Desktop) -->
+        <aside class="hidden md:flex flex-col w-64 bg-white border-r border-border-light fixed inset-y-0 left-0 z-20">
+            <div class="p-6 border-b border-border-light flex items-center justify-center">
+                <img src="logo-bmb-iniciais.png" alt="BMB" class="h-12">
             </div>
+            
+            <nav class="flex-grow p-4 space-y-2">
+                <button onclick="app.navigateTo('home')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-app-muted hover:text-bmb-blue transition active-nav" data-view="home">
+                    <i class="fa-solid fa-ticket w-5"></i> Sorteador
+                </button>
+                
+                <button onclick="app.navigateTo('events')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-app-muted hover:text-bmb-blue transition" data-view="events">
+                    <i class="fa-regular fa-calendar-check w-5"></i> Meus Eventos
+                </button>
+
+                <button id="sidebar-admin-btn" onclick="app.navigateTo('admin')" class="hidden nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-app-muted hover:text-bmb-blue transition" data-view="admin">
+                    <i class="fa-solid fa-user-shield w-5"></i> Admin Geral
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-border-light">
+                <div class="mb-4 px-4">
+                    <p class="text-xs text-txt-muted uppercase font-bold mb-1">Logado como</p>
+                    <p class="text-sm font-semibold text-txt-title truncate" id="sidebar-branch-name">Filial</p>
+                </div>
+                <button onclick="app.logout()" class="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-status-danger bg-red-50 hover:bg-red-100 rounded-lg transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Header -->
+        <header class="md:hidden bg-white border-b border-border-light p-4 flex justify-between items-center sticky top-0 z-30">
+            <img src="logo-bmb-iniciais.png" alt="BMB" class="h-8">
+            <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-txt-body p-2">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
         </header>
 
-        <!-- Conteúdo Principal -->
-        <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-border-light p-4 absolute w-full z-20 shadow-lg">
+            <nav class="space-y-2">
+                <button onclick="app.navigateTo('home'); document.getElementById('mobile-menu').classList.add('hidden')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-app-muted">Sorteador</button>
+                <button onclick="app.navigateTo('events'); document.getElementById('mobile-menu').classList.add('hidden')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-app-muted">Meus Eventos</button>
+                <button id="mobile-admin-btn" onclick="app.navigateTo('admin'); document.getElementById('mobile-menu').classList.add('hidden')" class="hidden block w-full text-left px-4 py-3 rounded-lg hover:bg-app-muted">Admin</button>
+                <button onclick="app.logout()" class="block w-full text-left px-4 py-3 rounded-lg text-status-danger hover:bg-red-50">Sair</button>
+            </nav>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="md:ml-64 p-4 md:p-8 min-h-screen">
             
-            <!-- Área de Sorteio (Esquerda/Centro) -->
-            <div class="lg:col-span-2 flex flex-col gap-6">
-                <div class="bg-app-card rounded-[16px] shadow-sm p-8 text-center border border-border-light flex flex-col items-center justify-center h-full min-h-[400px]">
-                    
-                    <!-- Logo Initials (BMB) acima do texto -->
-                    <img src="logo-bmb-iniciais.png" alt="BMB Logo" class="h-20 mb-4">
-                    <h3 class="text-txt-muted uppercase tracking-widest text-sm font-semibold mb-6">Número Sorteado</h3>
-                    
-                    <!-- Display do Número -->
-                    <div class="bg-app-muted rounded-[14px] p-8 mb-8 w-full max-w-xl">
-                        <span id="raffle-display" class="digit-display text-6xl md:text-[4rem] font-bold text-action-primary block tracking-[6px]">
-                            000000
-                        </span>
-                    </div>
-
-                    <!-- Configuração do Item -->
-                    <div class="mb-4 w-full max-w-xs">
-                        <label for="raffle-item" class="block text-sm font-medium text-txt-muted mb-1">Item a ser Sorteado</label>
-                        <input type="text" id="raffle-item" placeholder="Ex: iPhone 15, Vale Compras..." 
-                            class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue transition text-center text-lg text-txt-title">
-                    </div>
-
-                    <!-- Configuração do Limite -->
-                    <div class="mb-6 w-full max-w-xs">
-                        <label for="max-number" class="block text-sm font-medium text-txt-muted mb-1">Quantidade de Participantes (Máximo)</label>
-                        <input type="number" id="max-number" value="10000" min="1" 
-                            class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue transition text-center text-lg font-mono text-txt-title">
-                    </div>
-
-                    <!-- Botão de Ação -->
-                    <button id="btn-draw" onclick="app.startRaffle()"
-                        class="group relative bg-action-primary hover:bg-action-hover text-white text-xl font-semibold py-4 px-12 rounded-full shadow-none transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed w-full max-w-xs">
-                        <span id="btn-text">SORTEAR AGORA</span>
-                        <span id="btn-loading" class="hidden absolute inset-0 flex items-center justify-center">
-                            <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Sorteando...
-                        </span>
-                    </button>
-                    
-                    <p class="mt-4 text-txt-muted text-sm">
-                        Sorteando entre 0 e o número definido acima.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Sidebar de Resultados (Direita) -->
-            <div class="lg:col-span-1">
-                <div class="bg-app-card rounded-[16px] shadow-sm border border-border-light h-full flex flex-col">
-                    <div class="p-5 border-b border-border-light bg-app-muted rounded-t-[16px] flex justify-between items-center">
-                        <h3 class="font-bold text-txt-title"><i class="fa-solid fa-list-ol mr-2"></i> Histórico</h3>
-                        <span id="history-count" class="bg-border-light text-txt-body text-xs font-bold px-2 py-1 rounded-full">0</span>
-                    </div>
-                    
-                    <div class="p-4 flex-grow overflow-y-auto max-h-[500px]" id="history-list">
-                        <!-- Itens serão inseridos aqui via JS -->
-                        <div class="text-center text-txt-muted py-8 text-sm">
-                            Nenhum sorteio realizado ainda.
+            <!-- VIEW: SORTEADOR (HOME) -->
+            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-3 gap-8 fade-in">
+                <!-- Área de Sorteio -->
+                <div class="lg:col-span-2 flex flex-col gap-6">
+                    <div class="bg-app-card rounded-[16px] shadow-sm p-8 text-center border border-border-light flex flex-col items-center justify-center h-full min-h-[400px]">
+                        <img src="logo-bmb-iniciais.png" alt="BMB Logo" class="h-16 mb-4 opacity-80">
+                        <h3 class="text-txt-muted uppercase tracking-widest text-sm font-semibold mb-6">Sorteio em Andamento</h3>
+                        
+                        <div class="bg-app-muted rounded-[14px] p-8 mb-8 w-full max-w-xl border border-border-light">
+                            <span id="raffle-display" class="digit-display text-6xl md:text-[5rem] font-bold text-action-primary block tracking-[6px]">
+                                000000
+                            </span>
                         </div>
-                    </div>
-                    
-                    <div class="p-4 border-t border-border-light bg-app-muted rounded-b-[16px] text-center">
-                        <button onclick="app.clearHistory()" class="text-xs text-status-danger hover:text-red-700 font-medium">
-                            Limpar todo o histórico
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-xl mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-txt-muted mb-1">Prêmio / Item</label>
+                                <input type="text" id="raffle-item" placeholder="Ex: iPhone 15" 
+                                    class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue transition text-center font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-txt-muted mb-1">Participantes (Max)</label>
+                                <input type="number" id="max-number" value="10000" min="1" 
+                                    class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue transition text-center font-mono">
+                            </div>
+                        </div>
+
+                        <button id="btn-draw" onclick="app.startRaffle()"
+                            class="group relative bg-action-primary hover:bg-action-hover text-white text-xl font-semibold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed w-full max-w-xs">
+                            <span id="btn-text">SORTEAR AGORA</span>
+                            <span id="btn-loading" class="hidden absolute inset-0 flex items-center justify-center">
+                                <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Sorteando...
+                            </span>
                         </button>
                     </div>
                 </div>
-            </div>
 
-        </main>
-
-        <footer class="bg-app-card border-t border-border-light py-4 text-center text-txt-muted text-sm">
-            &copy; 2026 Sistema Corporativo. Todos os direitos reservados BMB Advertising Brasil.
-        </footer>
-    </section>
-
-    <!-- ======================== TELA DE ADMIN (SUPER USER) ======================== -->
-    <section id="admin-screen" class="hidden flex-col min-h-screen w-full fade-in bg-app-bg">
-        <header class="bg-txt-title text-white shadow-sm">
-            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-                <h2 class="font-bold text-lg"><i class="fa-solid fa-user-shield mr-2"></i> Painel do Super Admin</h2>
-                <button onclick="app.toggleAdminScreen()" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Dashboard
-                </button>
-            </div>
-        </header>
-        <main class="flex-grow container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            <!-- Coluna 1: Gestão de Filiais -->
-            <div class="bg-app-card rounded-[16px] shadow-sm p-6 border border-border-light">
-                <h3 class="font-bold text-xl text-txt-title mb-6 border-b border-border-light pb-2">Cadastrar Nova Filial</h3>
-                <form id="add-branch-form" class="space-y-4 mb-8">
-                    <input type="text" id="new-branch-name" placeholder="Nome da Filial" required class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="new-branch-code" placeholder="Código (ex: FILIAL99)" required class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue uppercase">
-                        <input type="text" id="new-branch-pass" placeholder="Senha" required class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue">
+                <!-- Sidebar de Histórico -->
+                <div class="lg:col-span-1">
+                    <div class="bg-app-card rounded-[16px] shadow-sm border border-border-light h-full flex flex-col max-h-[calc(100vh-100px)]">
+                        <div class="p-5 border-b border-border-light bg-app-muted rounded-t-[16px] flex justify-between items-center">
+                            <h3 class="font-bold text-txt-title"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico Recente</h3>
+                            <span id="history-count" class="bg-white border border-border-light text-txt-body text-xs font-bold px-2 py-1 rounded-full">0</span>
+                        </div>
+                        <div class="p-4 flex-grow overflow-y-auto" id="history-list">
+                            <!-- Itens via JS -->
+                        </div>
+                        <div class="p-4 border-t border-border-light text-center">
+                            <button onclick="app.clearHistory()" class="text-xs text-status-danger hover:underline">Limpar Histórico</button>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full bg-status-success hover:bg-green-700 text-white font-bold py-2 rounded-[10px] transition shadow-sm">
-                        <i class="fa-solid fa-plus mr-2"></i> Adicionar Filial
-                    </button>
-                </form>
+                </div>
+            </div>
 
-                <h3 class="font-bold text-lg text-txt-title mb-4">Filiais Cadastradas</h3>
-                <div class="overflow-y-auto max-h-[400px] border border-border-light rounded-[10px]">
+            <!-- VIEW: MEUS EVENTOS -->
+            <div id="view-events" class="view-section hidden fade-in max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-txt-title">Gestão de Eventos</h2>
+                    <button onclick="document.getElementById('new-event-modal').classList.remove('hidden')" class="bg-bmb-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-plus mr-2"></i> Novo Evento
+                    </button>
+                </div>
+
+                <!-- Modal Novo Evento (Inline simplificado) -->
+                <div id="new-event-modal" class="hidden mb-6 bg-white p-6 rounded-[16px] border border-border-light shadow-sm">
+                    <h3 class="font-bold text-lg mb-4">Cadastrar Novo Evento</h3>
+                    <form id="create-event-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="evt-name" placeholder="Nome do Evento (ex: Natal)" required class="p-3 border border-border-light rounded-lg w-full">
+                        <input type="text" id="evt-prize" placeholder="Prêmio" required class="p-3 border border-border-light rounded-lg w-full">
+                        <input type="number" id="evt-max" placeholder="Max Participantes" required class="p-3 border border-border-light rounded-lg w-full">
+                        <div class="md:col-span-3 flex justify-end gap-2 mt-2">
+                            <button type="button" onclick="document.getElementById('new-event-modal').classList.add('hidden')" class="px-4 py-2 text-txt-muted hover:text-txt-body">Cancelar</button>
+                            <button type="submit" class="bg-status-success text-white px-6 py-2 rounded-lg hover:bg-green-600">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista de Eventos -->
+                <div class="bg-white rounded-[16px] border border-border-light shadow-sm overflow-hidden">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-app-muted text-txt-body font-bold">
+                        <thead class="bg-app-muted text-txt-body font-semibold border-b border-border-light">
                             <tr>
-                                <th class="p-3">Nome</th>
-                                <th class="p-3">Código</th>
-                                <th class="p-3">Senha</th>
+                                <th class="p-4">Evento</th>
+                                <th class="p-4">Prêmio</th>
+                                <th class="p-4">Max</th>
+                                <th class="p-4 text-right">Ação</th>
                             </tr>
                         </thead>
-                        <tbody id="branches-list" class="divide-y divide-border-light"></tbody>
+                        <tbody id="events-list" class="divide-y divide-border-light">
+                            <!-- Preenchido via JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Coluna 2: Relatório Geral -->
-            <div class="bg-app-card rounded-[16px] shadow-sm p-6 border border-border-light">
-                <div class="flex justify-between items-center mb-4 border-b border-border-light pb-2">
-                    <h3 class="font-bold text-xl text-txt-title">Relatório Geral de Sorteios</h3>
-                    <button onclick="app.renderGlobalHistory()" class="text-xs bg-border-light hover:bg-gray-300 px-3 py-1 rounded transition"><i class="fa-solid fa-rotate mr-1"></i> Atualizar</button>
-                </div>
-                <div class="overflow-y-auto max-h-[600px] border border-border-light rounded-[10px]">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-app-muted text-txt-body font-bold">
-                            <tr>
-                                <th class="p-3">Filial</th>
-                                <th class="p-3">Prêmio</th>
-                                <th class="p-3">Número</th>
-                                <th class="p-3">Data/Hora</th>
-                            </tr>
-                        </thead>
-                        <tbody id="global-history-list" class="divide-y divide-border-light"></tbody>
-                    </table>
+            <!-- VIEW: ADMIN -->
+            <div id="view-admin" class="view-section hidden fade-in">
+                <h2 class="text-2xl font-bold text-txt-title mb-6"><i class="fa-solid fa-user-shield mr-2"></i> Painel Super Admin</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Cadastro Filiais -->
+                    <div class="bg-white p-6 rounded-[16px] border border-border-light shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Filiais</h3>
+                        <form id="add-branch-form" class="space-y-3 mb-6">
+                            <input type="text" id="new-branch-name" placeholder="Nome da Filial" required class="w-full p-3 border border-border-light rounded-lg">
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" id="new-branch-code" placeholder="Código" required class="w-full p-3 border border-border-light rounded-lg uppercase">
+                                <input type="text" id="new-branch-pass" placeholder="Senha" required class="w-full p-3 border border-border-light rounded-lg">
+                            </div>
+                            <button type="submit" class="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800">Adicionar</button>
+                        </form>
+                        <div class="overflow-y-auto max-h-[300px]">
+                            <table class="w-full text-sm"><tbody id="branches-list" class="divide-y divide-border-light"></tbody></table>
+                        </div>
+                    </div>
+
+                    <!-- Visualizador de Eventos Admin -->
+                    <div class="bg-white p-6 rounded-[16px] border border-border-light shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Eventos por Filial</h3>
+                        <p class="text-xs text-txt-muted mb-4">Selecione uma filial na lista ao lado para ver os eventos.</p>
+                        <div id="admin-events-list" class="text-sm text-txt-body space-y-2">
+                            <!-- Preenchido ao clicar na filial -->
+                            <div class="text-center py-8 text-txt-muted">Nenhuma filial selecionada.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -313,8 +335,7 @@
                 // Elementos DOM
                 this.screens = {
                     login: document.getElementById('login-screen'),
-                    dashboard: document.getElementById('dashboard-screen'),
-                    admin: document.getElementById('admin-screen')
+                    dashboard: document.getElementById('dashboard-screen')
                 };
                 this.display = document.getElementById('raffle-display');
                 this.maxNumberInput = document.getElementById('max-number');
@@ -324,7 +345,8 @@
                 this.btnDraw = document.getElementById('btn-draw');
                 this.btnText = document.getElementById('btn-text');
                 this.btnLoading = document.getElementById('btn-loading');
-                this.adminBtn = document.getElementById('admin-btn');
+                this.sidebarAdminBtn = document.getElementById('sidebar-admin-btn');
+                this.mobileAdminBtn = document.getElementById('mobile-admin-btn');
                 
                 this.init();
             }
@@ -346,6 +368,11 @@
                 document.getElementById('add-branch-form').addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.registerBranch();
+                });
+
+                document.getElementById('create-event-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createEvent();
                 });
             }
 
@@ -381,29 +408,48 @@
                 localStorage.removeItem('raffle_session');
                 this.currentUser = null;
                 this.screens.dashboard.classList.add('hidden');
-                this.screens.admin.classList.add('hidden');
                 this.screens.login.classList.remove('hidden');
                 document.getElementById('branch-code').value = '';
                 document.getElementById('password').value = '';
             }
+
+            // --- Navegação e Dashboard ---
 
             showDashboard() {
                 this.screens.login.classList.add('hidden');
                 this.screens.dashboard.classList.remove('hidden');
                 this.screens.dashboard.classList.add('flex'); // Tailwind flex display
                 
-                document.getElementById('header-branch-name').innerText = this.currentUser.nome_filial;
+                document.getElementById('sidebar-branch-name').innerText = this.currentUser.nome_filial;
                 
                 // Controle de Acesso Admin
                 if (this.currentUser.codigo_filial === 'ADMIN') {
-                    this.adminBtn.classList.remove('hidden');
-                    this.adminBtn.classList.add('flex');
+                    this.sidebarAdminBtn.classList.remove('hidden');
+                    this.sidebarAdminBtn.classList.add('flex');
+                    this.mobileAdminBtn.classList.remove('hidden');
                 } else {
-                    this.adminBtn.classList.add('hidden');
-                    this.adminBtn.classList.remove('flex');
+                    this.sidebarAdminBtn.classList.add('hidden');
+                    this.mobileAdminBtn.classList.add('hidden');
                 }
 
+                this.navigateTo('home');
                 this.renderHistory();
+            }
+
+            navigateTo(viewName) {
+                // Esconde todas as views
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                // Mostra a desejada
+                document.getElementById(`view-${viewName}`).classList.remove('hidden');
+                
+                // Atualiza estado visual do menu
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    if(el.dataset.view === viewName) el.classList.add('bg-app-muted', 'text-bmb-blue');
+                    else el.classList.remove('bg-app-muted', 'text-bmb-blue');
+                });
+
+                if(viewName === 'events') this.loadEvents();
+                if(viewName === 'admin') this.renderBranches();
             }
 
             // --- Lógica do Sorteio ---
@@ -453,6 +499,9 @@
                 this.saveResult(formattedNumber);
                 this.setLoadingState(false);
                 this.isAnimating = false;
+
+                // Dispara Confetes
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 
                 // Efeito visual de sucesso (piscar verde)
                 this.display.classList.add('text-status-success');
@@ -556,21 +605,6 @@
 
             // --- Funcionalidades Admin ---
 
-            toggleAdminScreen() {
-                if (this.screens.admin.classList.contains('hidden')) {
-                    this.screens.dashboard.classList.add('hidden');
-                    this.screens.dashboard.classList.remove('flex');
-                    this.screens.admin.classList.remove('hidden');
-                    this.screens.admin.classList.add('flex');
-                    this.renderBranches();
-                    this.renderGlobalHistory();
-                } else {
-                    this.screens.admin.classList.add('hidden');
-                    this.screens.admin.classList.remove('flex');
-                    this.showDashboard();
-                }
-            }
-
             async registerBranch() {
                 const name = document.getElementById('new-branch-name').value.trim();
                 const code = document.getElementById('new-branch-code').value.trim().toUpperCase();
@@ -607,44 +641,104 @@
                     if (user.codigo_filial === 'ADMIN') return; // Não listar o admin
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="p-3 font-medium text-txt-title">${user.nome_filial}</td>
-                        <td class="p-3 font-mono text-txt-body">${user.codigo_filial}</td>
-                        <td class="p-3 font-mono text-txt-muted">****</td>
+                        <td class="p-3 font-medium text-txt-title cursor-pointer hover:text-bmb-blue" onclick="app.loadAdminEvents('${user.codigo_filial}', '${user.nome_filial}')">
+                            ${user.nome_filial} <i class="fa-solid fa-chevron-right text-xs ml-2 opacity-50"></i>
+                        </td>
+                        <td class="p-3 font-mono text-txt-body text-xs">${user.codigo_filial}</td>
+                        <td class="p-3 font-mono text-txt-muted text-xs">****</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            async renderGlobalHistory() {
-                const tbody = document.getElementById('global-history-list');
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Carregando...</td></tr>';
-                
-                // Busca histórico e filiais
-                const { data: history } = await supabaseClient.from('raffle_history').select('*').order('created_at', { ascending: false });
-                const { data: branches } = await supabaseClient.from('filiais').select('codigo_filial, nome_filial');
-                
-                // Mapa de códigos para nomes
-                const branchMap = {};
-                if (branches) branches.forEach(b => branchMap[b.codigo_filial] = b.nome_filial);
+            // --- Gestão de Eventos (Filial) ---
 
+            async createEvent() {
+                const name = document.getElementById('evt-name').value;
+                const prize = document.getElementById('evt-prize').value;
+                const max = document.getElementById('evt-max').value;
+
+                const { error } = await supabaseClient.from('eventos').insert({
+                    branch_code: this.currentUser.codigo_filial,
+                    name: name,
+                    prize: prize,
+                    max_participants: max
+                });
+
+                if(error) alert('Erro ao criar evento: ' + error.message);
+                else {
+                    document.getElementById('create-event-form').reset();
+                    document.getElementById('new-event-modal').classList.add('hidden');
+                    this.loadEvents();
+                }
+            }
+
+            async loadEvents() {
+                const tbody = document.getElementById('events-list');
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-txt-muted">Carregando...</td></tr>';
+
+                const { data: events } = await supabaseClient.from('eventos')
+                    .select('*')
+                    .eq('branch_code', this.currentUser.codigo_filial)
+                    .order('created_at', { ascending: false });
+                
                 tbody.innerHTML = '';
+                if(!events || events.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-txt-muted">Nenhum evento cadastrado.</td></tr>';
+                    return;
+                }
 
-                if (history) {
-                    history.forEach(item => {
-                    const date = new Date(item.created_at).toLocaleString('pt-BR');
-                    const branchName = branchMap[item.branch_code] || item.branch_code;
-                    
+                events.forEach(evt => {
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-app-muted';
                     tr.innerHTML = `
-                        <td class="p-3 text-txt-title font-medium">${branchName}</td>
-                        <td class="p-3 text-sm text-txt-body">${item.item || '-'}</td>
-                        <td class="p-3 font-mono font-bold text-lg">${item.number}</td>
-                        <td class="p-3 text-txt-muted text-xs">${date}</td>
+                        <td class="p-4 font-medium">${evt.name}</td>
+                        <td class="p-4 text-txt-muted">${evt.prize}</td>
+                        <td class="p-4 font-mono">${evt.max_participants}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="app.prepareRaffle('${evt.prize}', ${evt.max_participants})" class="bg-action-primary text-white text-xs px-3 py-1 rounded hover:bg-action-hover transition">
+                                Sortear <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
+            }
+
+            prepareRaffle(prize, max) {
+                this.raffleItemInput.value = prize;
+                this.maxNumberInput.value = max;
+                this.navigateTo('home');
+            }
+
+            // --- Admin: Ver Eventos da Filial ---
+            async loadAdminEvents(branchCode, branchName) {
+                const container = document.getElementById('admin-events-list');
+                container.innerHTML = `<div class="text-center py-4">Carregando eventos de <strong>${branchName}</strong>...</div>`;
+
+                const { data: events } = await supabaseClient.from('eventos')
+                    .select('*')
+                    .eq('branch_code', branchCode)
+                    .order('created_at', { ascending: false });
+
+                container.innerHTML = `<h4 class="font-bold text-bmb-blue mb-3">Eventos: ${branchName}</h4>`;
+                
+                if(!events || events.length === 0) {
+                    container.innerHTML += '<div class="text-txt-muted text-sm">Nenhum evento encontrado para esta filial.</div>';
+                    return;
                 }
+
+                events.forEach(evt => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 bg-app-muted rounded border border-border-light mb-2';
+                    div.innerHTML = `
+                        <div class="font-bold text-txt-title">${evt.name}</div>
+                        <div class="text-xs text-txt-muted flex justify-between mt-1">
+                            <span>Prêmio: ${evt.prize}</span>
+                            <span>Max: ${evt.max_participants}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
             }
         }
 
