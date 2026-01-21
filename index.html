@@ -258,7 +258,7 @@
             <img src="logo-bmb-iniciais.png" class="fixed top-1/2 left-[calc(50%+8rem)] transform -translate-x-1/2 -translate-y-1/2 w-[40%] opacity-[0.03] pointer-events-none z-0">
 
             <!-- VIEW: SORTEADOR (HOME) -->
-            <div id="view-home" class="view-section grid grid-cols-[60fr_25fr] gap-6 fade-in relative z-10 h-full w-full">
+            <div id="view-home" class="view-section grid grid-cols-[65fr_20fr] gap-6 fade-in relative z-10 h-full w-full">
                 <!-- Área de Sorteio -->
                 <div class="h-full flex flex-col justify-center">
                     <div class="bg-app-card rounded-[24px] shadow-2xl p-8 text-center border border-border-light flex flex-col items-center justify-center h-full relative overflow-hidden backdrop-blur-sm bg-opacity-90">
@@ -301,7 +301,7 @@
                 <!-- Histórico (Direita) -->
                 <div class="h-full flex flex-col overflow-hidden bg-app-card rounded-[24px] border border-border-light shadow-xl">
                     <div class="p-4 border-b border-border-light bg-app-muted flex justify-between items-center">
-                        <h3 class="font-bold text-sm text-txt-title uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico</h3>
+                        <h3 class="font-bold text-sm text-txt-title uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Hoje</h3>
                         <span id="history-count" class="bg-white/10 border border-border-light text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
                     </div>
                     <div id="history-list" class="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar">
@@ -351,6 +351,28 @@
                             <!-- Preenchido via JS -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- VIEW: HISTÓRICO GERAL -->
+            <div id="view-history" class="view-section hidden fade-in h-full flex flex-col max-w-6xl mx-auto">
+                <h2 class="text-2xl font-bold text-txt-title mb-6 flex-shrink-0"><i class="fa-solid fa-list mr-2"></i> Histórico Geral de Sorteios</h2>
+                <div class="bg-white rounded-[16px] border border-border-light shadow-sm overflow-hidden flex-grow flex flex-col">
+                    <div class="overflow-y-auto flex-grow custom-scrollbar">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-app-muted text-txt-body font-semibold border-b border-border-light sticky top-0">
+                                <tr>
+                                    <th class="p-4">Data/Hora</th>
+                                    <th class="p-4">Filial</th>
+                                    <th class="p-4">Número</th>
+                                    <th class="p-4">Prêmio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="global-history-list" class="divide-y divide-border-light bg-white">
+                                <!-- Preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -536,6 +558,7 @@
                 });
 
                 if(viewName === 'events') this.loadEvents();
+                if(viewName === 'history') this.loadGlobalHistory();
                 if(viewName === 'admin') this.renderBranches();
             }
 
@@ -661,10 +684,13 @@
             }
 
             async renderHistory() {
+                const today = new Date().toISOString().split('T')[0]; // Data de hoje YYYY-MM-DD
+
                 const { data: history, error } = await supabaseClient
                     .from('raffle_history')
                     .select('*')
                     .eq('branch_code', this.currentUser.codigo_filial)
+                    .gte('created_at', today) // Filtra apenas sorteios de hoje em diante
                     .order('created_at', { ascending: false });
                 
                 if (error) {
@@ -679,7 +705,7 @@
                     this.historyList.innerHTML = `
                         <div class="text-center text-txt-muted py-8 text-sm flex flex-col items-center">
                             <i class="fa-regular fa-folder-open text-2xl mb-2 opacity-50"></i>
-                            Nenhum sorteio realizado.
+                            Nenhum sorteio hoje.
                         </div>`;
                     return;
                 }
@@ -695,7 +721,7 @@
                         </div>
                         <div>
                             ${item.item ? `<span class="text-[9px] font-bold text-white mb-0.5 block uppercase tracking-wide truncate">${item.item}</span>` : ''}
-                            <span class="text-[8px] text-txt-muted block">${date}</span>
+                            <span class="text-[8px] text-txt-muted block text-right">${date.split(',')[1]}</span>
                         </div>
                     `;
                     this.historyList.appendChild(div);
@@ -837,6 +863,42 @@
                         </div>
                     `;
                     container.appendChild(div);
+                });
+            }
+
+            // --- Histórico Geral (Todas as Filiais) ---
+            async loadGlobalHistory() {
+                const tbody = document.getElementById('global-history-list');
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-txt-muted">Carregando histórico completo...</td></tr>';
+
+                // Busca sem filtros de data, ordenado por mais recente
+                const { data: history, error } = await supabaseClient
+                    .from('raffle_history')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(500); // Limite de segurança para performance
+
+                if (error) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-status-danger">Erro ao carregar: ${error.message}</td></tr>`;
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                if (!history || history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-txt-muted">Nenhum registro encontrado.</td></tr>';
+                    return;
+                }
+
+                history.forEach(item => {
+                    const date = new Date(item.created_at).toLocaleString('pt-BR');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-4 text-txt-muted whitespace-nowrap">${date}</td>
+                        <td class="p-4 font-medium text-bmb-blue">${item.branch_code}</td>
+                        <td class="p-4 font-mono font-bold text-lg text-black">${item.number}</td>
+                        <td class="p-4 text-txt-body font-medium">${item.item || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
                 });
             }
         }
