@@ -249,11 +249,9 @@
 
         <!-- Main Content Area -->
         <main class="md:ml-64 p-4 md:p-8 min-h-screen">
-            <!-- Marca D'água Centralizada -->
-            <img src="logo-bmb-iniciais.png" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60%] opacity-5 pointer-events-none z-0">
             
             <!-- VIEW: SORTEADOR (HOME) -->
-            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-2 gap-8 fade-in relative z-10 h-[calc(100vh-4rem)]">
+            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-8 fade-in relative z-10 h-[calc(100vh-4rem)]">
                 <!-- Área de Sorteio -->
                 <div class="flex flex-col gap-6 h-full">
                     <div class="bg-app-card rounded-[16px] shadow-2xl p-8 text-center border border-border-light flex flex-col items-center justify-center h-full relative overflow-hidden">
@@ -264,7 +262,7 @@
                         <h3 class="text-txt-muted uppercase tracking-[0.2em] text-lg font-bold mb-4">Sorteio em Andamento</h3>
                         
                         <div class="w-full flex-grow flex items-center justify-center">
-                            <span id="raffle-display" class="digit-display text-[20vh] lg:text-[35vh] font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]">
+                            <span id="raffle-display" class="digit-display text-[20vh] lg:text-[42vh] font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] select-none">
                                 000000
                             </span>
                         </div>
@@ -296,7 +294,7 @@
                 <div>
                     <div class="bg-app-card rounded-[16px] shadow-sm border border-border-light h-full flex flex-col max-h-[calc(100vh-100px)]">
                         <div class="p-5 border-b border-border-light bg-app-muted rounded-t-[16px] flex justify-between items-center">
-                            <h3 class="font-bold text-xl text-txt-title"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Últimos Sorteios</h3>
+                            <h3 class="font-bold text-lg text-txt-title"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico</h3>
                             <span id="history-count" class="bg-white/10 border border-border-light text-white text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </div>
                         <div class="p-4 flex-grow overflow-y-auto" id="history-list">
@@ -683,11 +681,11 @@
                 history.forEach(item => {
                     const date = new Date(item.created_at).toLocaleString('pt-BR');
                     const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-app-muted p-6 mb-4 rounded-[14px] border border-border-light shadow-sm hover:border-bmb-blue transition-colors';
+                    div.className = 'flex justify-between items-center bg-app-muted p-4 mb-3 rounded-[12px] border border-border-light shadow-sm hover:border-bmb-blue transition-colors';
                     div.innerHTML = `
                         <div>
-                            <span class="block font-mono font-black text-4xl text-[#FFD700] tracking-widest mb-1">${item.number}</span>
-                            ${item.item ? `<span class="text-lg font-bold text-white mb-1 block uppercase tracking-wide">${item.item}</span>` : ''}
+                            <span class="block font-mono font-black text-2xl text-[#FFD700] tracking-widest mb-1">${item.number}</span>
+                            ${item.item ? `<span class="text-sm font-bold text-white mb-1 block uppercase tracking-wide">${item.item}</span>` : ''}
                             <span class="text-xs text-txt-muted">${date}</span>
                         </div>
                         <button onclick="app.deleteResult(${item.id})" class="text-txt-muted hover:text-status-danger transition p-2" title="Excluir">
