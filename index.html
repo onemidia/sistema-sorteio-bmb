@@ -149,7 +149,7 @@
         }
     </style>
 </head>
-<body class="bg-app-bg text-txt-body font-sans min-h-screen flex flex-col">
+<body class="bg-app-bg text-txt-body font-sans h-screen overflow-hidden flex flex-col">
 
     <!-- ======================== TELA DE LOGIN ======================== -->
     <section id="login-screen" class="flex-grow flex items-center justify-center p-4">
@@ -196,7 +196,7 @@
     </section>
 
     <!-- ======================== DASHBOARD ======================== -->
-    <section id="dashboard-screen" class="hidden min-h-screen w-full fade-in bg-app-bg">
+    <section id="dashboard-screen" class="hidden h-screen w-full fade-in bg-app-bg overflow-hidden">
         
         <!-- Sidebar (Desktop) -->
         <aside class="hidden md:flex flex-col w-64 bg-[#050505] border-r border-border-light fixed inset-y-0 left-0 z-20">
@@ -248,10 +248,10 @@
         </div>
 
         <!-- Main Content Area -->
-        <main class="md:ml-64 p-4 md:p-8 min-h-screen">
+        <main class="md:ml-64 h-screen overflow-hidden p-4">
             
             <!-- VIEW: SORTEADOR (HOME) -->
-            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-[4fr_1fr] gap-8 fade-in relative z-10 h-[calc(100vh-4rem)]">
+            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-[85fr_15fr] gap-4 fade-in relative z-10 h-full pb-4">
                 <!-- Área de Sorteio -->
                 <div class="flex flex-col gap-6 h-full">
                     <div class="bg-app-card rounded-[16px] shadow-2xl p-8 text-center border border-border-light flex flex-col items-center justify-center h-full relative overflow-hidden">
@@ -262,7 +262,7 @@
                         <h3 class="text-txt-muted uppercase tracking-[0.2em] text-lg font-bold mb-4">Sorteio em Andamento</h3>
                         
                         <div class="w-full flex-grow flex items-center justify-center">
-                            <span id="raffle-display" class="digit-display text-[20vh] lg:text-[42vh] font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] select-none">
+                            <span id="raffle-display" class="digit-display font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)] select-none" style="font-size: min(20vw, 50vh);">
                                 000000
                             </span>
                         </div>
@@ -292,7 +292,7 @@
 
                 <!-- Sidebar de Histórico -->
                 <div>
-                    <div class="bg-app-card rounded-[16px] shadow-sm border border-border-light h-full flex flex-col max-h-[calc(100vh-100px)]">
+                    <div class="bg-app-card rounded-[16px] shadow-sm border border-border-light h-full flex flex-col overflow-hidden">
                         <div class="p-5 border-b border-border-light bg-app-muted rounded-t-[16px] flex justify-between items-center">
                             <h3 class="font-bold text-lg text-txt-title"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico</h3>
                             <span id="history-count" class="bg-white/10 border border-border-light text-white text-sm font-bold px-3 py-1 rounded-full">0</span>
@@ -681,16 +681,16 @@
                 history.forEach(item => {
                     const date = new Date(item.created_at).toLocaleString('pt-BR');
                     const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-app-muted p-4 mb-3 rounded-[12px] border border-border-light shadow-sm hover:border-bmb-blue transition-colors';
+                    div.className = 'flex flex-col bg-app-muted p-3 mb-2 rounded-[10px] border border-border-light shadow-sm hover:border-bmb-blue transition-colors';
                     div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="block font-mono font-black text-xl text-[#FFD700] tracking-widest">${item.number}</span>
+                            <button onclick="app.deleteResult(${item.id})" class="text-txt-muted hover:text-status-danger transition p-1" title="Excluir"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        </div>
                         <div>
-                            <span class="block font-mono font-black text-2xl text-[#FFD700] tracking-widest mb-1">${item.number}</span>
-                            ${item.item ? `<span class="text-sm font-bold text-white mb-1 block uppercase tracking-wide">${item.item}</span>` : ''}
+                            ${item.item ? `<span class="text-xs font-bold text-white mb-0.5 block uppercase tracking-wide truncate">${item.item}</span>` : ''}
                             <span class="text-xs text-txt-muted">${date}</span>
                         </div>
-                        <button onclick="app.deleteResult(${item.id})" class="text-txt-muted hover:text-status-danger transition p-2" title="Excluir">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
                     `;
                     this.historyList.appendChild(div);
                 });
