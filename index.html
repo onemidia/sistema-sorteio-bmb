@@ -27,17 +27,17 @@
                 extend: {
                     colors: {
                         app: {
-                            bg: '#F3F6F9',
-                            card: '#FFFFFF',
-                            muted: '#F8FAFC',
+                            bg: '#000000',
+                            card: '#111111',
+                            muted: '#1A1A1A',
                         },
                         txt: {
-                            title: '#0F172A',
-                            body: '#475569',
-                            muted: '#94A3B8',
+                            title: '#FFFFFF',
+                            body: '#E2E8F0',
+                            muted: '#64748B',
                         },
                         border: {
-                            light: '#E2E8F0',
+                            light: '#333333',
                         },
                         bmb: {
                             blue: '#0A73B8',
@@ -75,6 +75,77 @@
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.1em;
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* ======================== MODO TELÃO LED ======================== */
+        body.fullscreen-mode {
+            background-color: #000000 !important;
+            overflow: hidden;
+        }
+        
+        /* Esconde elementos desnecessários */
+        body.fullscreen-mode aside,
+        body.fullscreen-mode header,
+        body.fullscreen-mode .lg\:col-span-1, /* Sidebar Histórico */
+        body.fullscreen-mode #btn-draw,
+        body.fullscreen-mode label,
+        body.fullscreen-mode #max-number,
+        body.fullscreen-mode .text-txt-muted,
+        body.fullscreen-mode img,
+        body.fullscreen-mode h3,
+        body.fullscreen-mode #fullscreen-btn,
+        body.fullscreen-mode #mobile-menu
+        {
+            display: none !important;
+        }
+
+        /* Centraliza o Main */
+        body.fullscreen-mode main {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.fullscreen-mode #view-home {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        body.fullscreen-mode .bg-app-card,
+        body.fullscreen-mode .bg-app-muted {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Tipografia LED */
+        body.fullscreen-mode #raffle-display {
+            font-size: 35vh !important;
+            font-weight: 900 !important;
+            color: #FFD700 !important; /* Amarelo Vibrante */
+            text-shadow: 5px 5px 0px #000000, 0 0 30px rgba(255, 215, 0, 0.2) !important;
+            line-height: 1;
+        }
+
+        body.fullscreen-mode #raffle-item {
+            display: block !important;
+            background: transparent !important;
+            border: none !important;
+            color: #FFFFFF !important;
+            font-size: 6vh !important;
+            font-weight: 700 !important;
+            text-align: center;
+            width: 100%;
+            margin-top: 0;
+            text-shadow: 2px 2px 0px #000000;
         }
     </style>
 </head>
@@ -128,21 +199,21 @@
     <section id="dashboard-screen" class="hidden min-h-screen w-full fade-in bg-app-bg">
         
         <!-- Sidebar (Desktop) -->
-        <aside class="hidden md:flex flex-col w-64 bg-white border-r border-border-light fixed inset-y-0 left-0 z-20">
+        <aside class="hidden md:flex flex-col w-64 bg-[#050505] border-r border-border-light fixed inset-y-0 left-0 z-20">
             <div class="p-6 border-b border-border-light flex items-center justify-center">
-                <img src="logo-bmb-iniciais.png" alt="BMB" class="h-12">
+                <img src="logo-bmb.png" alt="BMB" class="h-12">
             </div>
             
             <nav class="flex-grow p-4 space-y-2">
-                <button onclick="app.navigateTo('home')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-app-muted hover:text-bmb-blue transition active-nav" data-view="home">
+                <button onclick="app.navigateTo('home')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-white/10 hover:text-bmb-blue transition active-nav" data-view="home">
                     <i class="fa-solid fa-ticket w-5"></i> Sorteador
                 </button>
                 
-                <button onclick="app.navigateTo('events')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-app-muted hover:text-bmb-blue transition" data-view="events">
+                <button onclick="app.navigateTo('events')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-white/10 hover:text-bmb-blue transition" data-view="events">
                     <i class="fa-regular fa-calendar-check w-5"></i> Meus Eventos
                 </button>
 
-                <button id="sidebar-admin-btn" onclick="app.navigateTo('admin')" class="hidden nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-app-muted hover:text-bmb-blue transition" data-view="admin">
+                <button id="sidebar-admin-btn" onclick="app.navigateTo('admin')" class="hidden nav-item w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-txt-body hover:bg-white/10 hover:text-bmb-blue transition" data-view="admin">
                     <i class="fa-solid fa-user-shield w-5"></i> Admin Geral
                 </button>
             </nav>
@@ -178,36 +249,41 @@
 
         <!-- Main Content Area -->
         <main class="md:ml-64 p-4 md:p-8 min-h-screen">
+            <!-- Marca D'água Centralizada -->
+            <img src="logo-bmb-iniciais.png" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60%] opacity-5 pointer-events-none z-0">
             
             <!-- VIEW: SORTEADOR (HOME) -->
-            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-3 gap-8 fade-in">
+            <div id="view-home" class="view-section grid grid-cols-1 lg:grid-cols-2 gap-8 fade-in relative z-10 h-[calc(100vh-4rem)]">
                 <!-- Área de Sorteio -->
-                <div class="lg:col-span-2 flex flex-col gap-6">
-                    <div class="bg-app-card rounded-[16px] shadow-sm p-8 text-center border border-border-light flex flex-col items-center justify-center h-full min-h-[400px]">
-                        <img src="logo-bmb-iniciais.png" alt="BMB Logo" class="h-16 mb-4 opacity-80">
-                        <h3 class="text-txt-muted uppercase tracking-widest text-sm font-semibold mb-6">Sorteio em Andamento</h3>
+                <div class="flex flex-col gap-6 h-full">
+                    <div class="bg-app-card rounded-[16px] shadow-2xl p-8 text-center border border-border-light flex flex-col items-center justify-center h-full relative overflow-hidden">
+                        <button id="fullscreen-btn" onclick="app.toggleFullScreenView()" class="absolute top-4 right-4 text-txt-muted hover:text-bmb-blue transition p-2" title="Modo Telão">
+                            <i class="fa-solid fa-expand text-xl"></i>
+                        </button>
+                        <!-- Logo removida daqui para limpar o visual -->
+                        <h3 class="text-txt-muted uppercase tracking-[0.2em] text-lg font-bold mb-4">Sorteio em Andamento</h3>
                         
-                        <div class="bg-app-muted rounded-[14px] p-8 mb-8 w-full max-w-xl border border-border-light">
-                            <span id="raffle-display" class="digit-display text-6xl md:text-[5rem] font-bold text-action-primary block tracking-[6px]">
+                        <div class="w-full flex-grow flex items-center justify-center">
+                            <span id="raffle-display" class="digit-display text-[20vh] lg:text-[35vh] font-[900] text-[#FFD700] block tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]">
                                 000000
                             </span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-xl mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl mb-8">
                             <div>
-                                <label class="block text-sm font-medium text-txt-muted mb-1">Prêmio / Item</label>
+                                <label class="block text-xs uppercase tracking-wider font-bold text-txt-muted mb-2">Prêmio / Item</label>
                                 <input type="text" id="raffle-item" placeholder="Ex: iPhone 15" 
-                                    class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue transition text-center font-medium">
+                                    class="w-full p-4 bg-app-muted border border-border-light rounded-[12px] focus:outline-none focus:border-bmb-blue transition text-center font-bold text-xl text-white placeholder-gray-600">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-txt-muted mb-1">Participantes (Max)</label>
+                                <label class="block text-xs uppercase tracking-wider font-bold text-txt-muted mb-2">Participantes (Max)</label>
                                 <input type="number" id="max-number" value="10000" min="1" 
-                                    class="w-full p-3 border border-border-light rounded-[10px] focus:outline-none focus:border-bmb-blue transition text-center font-mono">
+                                    class="w-full p-4 bg-app-muted border border-border-light rounded-[12px] focus:outline-none focus:border-bmb-blue transition text-center font-mono text-xl text-white">
                             </div>
                         </div>
 
                         <button id="btn-draw" onclick="app.startRaffle()"
-                            class="group relative bg-action-primary hover:bg-action-hover text-white text-xl font-semibold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed w-full max-w-xs">
+                            class="group relative bg-[#FFD700] hover:bg-[#E6C200] text-black text-2xl font-black uppercase tracking-wider py-6 px-16 rounded-full shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed w-full max-w-md transform hover:scale-105">
                             <span id="btn-text">SORTEAR AGORA</span>
                             <span id="btn-loading" class="hidden absolute inset-0 flex items-center justify-center">
                                 <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Sorteando...
@@ -217,11 +293,11 @@
                 </div>
 
                 <!-- Sidebar de Histórico -->
-                <div class="lg:col-span-1">
+                <div>
                     <div class="bg-app-card rounded-[16px] shadow-sm border border-border-light h-full flex flex-col max-h-[calc(100vh-100px)]">
                         <div class="p-5 border-b border-border-light bg-app-muted rounded-t-[16px] flex justify-between items-center">
-                            <h3 class="font-bold text-txt-title"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Histórico Recente</h3>
-                            <span id="history-count" class="bg-white border border-border-light text-txt-body text-xs font-bold px-2 py-1 rounded-full">0</span>
+                            <h3 class="font-bold text-xl text-txt-title"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Últimos Sorteios</h3>
+                            <span id="history-count" class="bg-white/10 border border-border-light text-white text-sm font-bold px-3 py-1 rounded-full">0</span>
                         </div>
                         <div class="p-4 flex-grow overflow-y-auto" id="history-list">
                             <!-- Itens via JS -->
@@ -374,6 +450,13 @@
                     e.preventDefault();
                     this.createEvent();
                 });
+
+                // Atalho ESC para sair do modo tela cheia
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && document.body.classList.contains('fullscreen-mode')) {
+                        this.toggleFullScreenView();
+                    }
+                });
             }
 
             // --- Autenticação ---
@@ -444,12 +527,24 @@
                 
                 // Atualiza estado visual do menu
                 document.querySelectorAll('.nav-item').forEach(el => {
-                    if(el.dataset.view === viewName) el.classList.add('bg-app-muted', 'text-bmb-blue');
-                    else el.classList.remove('bg-app-muted', 'text-bmb-blue');
+                    if(el.dataset.view === viewName) el.classList.add('bg-white/10', 'text-bmb-blue');
+                    else el.classList.remove('bg-white/10', 'text-bmb-blue');
                 });
 
                 if(viewName === 'events') this.loadEvents();
                 if(viewName === 'admin') this.renderBranches();
+            }
+
+            // --- Modo Telão ---
+            toggleFullScreenView() {
+                document.body.classList.toggle('fullscreen-mode');
+                
+                // Tenta ativar o Fullscreen do navegador para imersão total
+                if (document.body.classList.contains('fullscreen-mode')) {
+                    document.documentElement.requestFullscreen().catch(e => console.log(e));
+                } else {
+                    if (document.fullscreenElement) document.exitFullscreen();
+                }
             }
 
             // --- Lógica do Sorteio ---
@@ -588,11 +683,11 @@
                 history.forEach(item => {
                     const date = new Date(item.created_at).toLocaleString('pt-BR');
                     const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-app-card p-3 mb-2 rounded-[10px] border border-border-light shadow-sm hover:shadow-md transition-shadow';
+                    div.className = 'flex justify-between items-center bg-app-muted p-6 mb-4 rounded-[14px] border border-border-light shadow-sm hover:border-bmb-blue transition-colors';
                     div.innerHTML = `
                         <div>
-                            <span class="block font-mono font-bold text-lg text-txt-title tracking-wider">${item.number}</span>
-                            ${item.item ? `<span class="text-xs font-semibold text-bmb-blue mb-1 block uppercase">${item.item}</span>` : ''}
+                            <span class="block font-mono font-black text-4xl text-[#FFD700] tracking-widest mb-1">${item.number}</span>
+                            ${item.item ? `<span class="text-lg font-bold text-white mb-1 block uppercase tracking-wide">${item.item}</span>` : ''}
                             <span class="text-xs text-txt-muted">${date}</span>
                         </div>
                         <button onclick="app.deleteResult(${item.id})" class="text-txt-muted hover:text-status-danger transition p-2" title="Excluir">
